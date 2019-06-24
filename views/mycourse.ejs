@@ -1,0 +1,110 @@
+
+<!DOCTYPE html>
+<html class='no-js' lang='en'>
+  <head>
+    <meta charset='utf-8'>
+    <meta content='IE=edge,chrome=1' http-equiv='X-UA-Compatible'>
+    <title>我的课程</title>
+
+    <link href="/css/iconfont.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" type="text/css" href="/css/bootstrap.css">
+	<style type="text/css">
+		.alert-danger{
+			width: 50%;
+		}
+	</style>
+
+    
+  </head>
+  <body class='main page'>
+  	<nav class="navbar navbar-default">
+		  <div class="container-fluid">
+		    <!-- Brand and toggle get grouped for better mobile display -->
+		    <div class="navbar-header">
+		      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+		        <span class="sr-only">Toggle navigation</span>
+		        <span class="icon-bar"></span>
+		        <span class="icon-bar"></span>
+		        <span class="icon-bar"></span>
+		      </button>
+		      <a class="navbar-brand" href="#">中山大学新华学院</a>
+		    </div>
+
+		    <!-- Collect the nav links, forms, and other content for toggling -->
+		    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+		      <ul class="nav navbar-nav">
+		        <li><a href="/">选课报名</a></li>
+		        <li class="active"><a>我的选课</a></li>
+                <li><a href="changepw">修改密码</a></li>
+
+		      </ul>
+	
+		      <ul class="nav navbar-nav navbar-right">
+		        <li><a>欢迎你，<%= grade %>学生：<%= name %>（<%= sid %>）！</a></li>
+                <li><a href="/logout">退出登录</a></li>
+		      </ul>
+		    </div><!-- /.navbar-collapse -->
+		  </div><!-- /.container-fluid -->
+	</nav>
+
+	<div class="container">
+		<div class="row">
+			<h1>我的课程</h1>
+			<hr>
+
+			<div class="col-lg-12">
+				<p class="my">我已经报名的课程有：</p>
+				<table class="table">
+					<tr>
+						<th>课程编号</th>
+						<th>名字</th>
+						<th>讲师</th>
+						<th>剩余人数</th>
+						<th>星期几</th>
+						<th>退报</th>
+					</tr>
+				</table>
+
+			</div>
+		</div>
+	</div>
+
+
+
+
+    <script type="text/javascript" src="/js/jquery.min.js"></script>
+    <script type="text/javascript" src="/js/bootstrap.js"></script>
+	<script type="text/javascript">
+		
+		//下面的代码牛逼了，是后端和前端的配合生成了
+		var mycourses = [<%= mycourses%>];
+
+		if(mycourses.length == 0){
+			$('.table').hide();
+			$('.my').html('我还没有报名任何课程')
+		}
+
+		$.each(mycourses,function(index,item){
+			$.get('/course/' + item , function(data){
+				var thedata = data.results[0];
+				$tr = $('<tr></tr>');
+				$("<td>" + thedata['cid'] + "</td>").appendTo($tr);
+				$("<td>" + thedata['name'] + "</td>").appendTo($tr);
+				$("<td>" + thedata['teacher'] + "</td>").appendTo($tr);
+				$("<td>" + thedata['number'] + "</td>").appendTo($tr);
+				$("<td>" + thedata['dayofweek'] + "</td>").appendTo($tr);
+				$("<td><input type='button' class='btn btn-danger tuibaobtn' value='退报' data-cid='" + thedata['cid'] +"'/></td>").appendTo($tr);
+				$tr.appendTo('.table');	
+			});
+		})
+
+		$('table').delegate('.tuibaobtn','click',function(){
+			var cid = $(this).attr('data-cid');
+			$.post('/tuibao' , {'cid' : cid}, function(){
+				alert('退报成功！')
+			})
+		})
+	</script>
+ 
+  </body>
+</html>
